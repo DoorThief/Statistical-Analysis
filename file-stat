@@ -1,0 +1,75 @@
+#!/bin/bash
+file=$1
+
+#Clear variables
+i=0
+n=0
+sum=0
+sd=0
+se=0
+score=0
+ev=0
+sdp=0
+sep=0
+m=0
+line=0
+
+#Func
+getb() {
+if [[ -z $file ]]; then
+	echo "Usage: <filename>"
+	exit 1
+elif [[ -f $file  ]]; then
+	n=0
+	for line in $(cat $file); do
+		sum=$(echo "$sum + $line" | bc -l)
+		n=$(($n+1))
+	done
+	avg=$(echo "$sum / $n" | bc -l)
+else
+	echo "Error: $file - Is not a file"
+	exit -1
+fi
+}
+
+getsd() {
+i=0
+sd=0
+	for i in $(cat $file); do
+		sd=$(echo "$sd + ($i - $avg)^2" | bc -l)
+	done
+	sd=$(echo "sqrt($sd / $n)" | bc -l)
+}
+
+getse() {
+se=0
+	se=$(echo "$sd / sqrt($n)" | bc -l)
+}
+
+ttest() {
+	sdp=$(echo "$sd * sqrt($n / ($n - 1))" | bc -l)
+	sep=$(echo "$sdp / sqrt($n)" | bc -l)
+	score=$(echo "($avg - $ev) / $sep" | bc -l)
+}
+
+ztest() {
+	score=$(echo "($avg - $ev) / $se" | bc -l)
+}
+
+getb
+getsd
+getse
+echo "Dataset:"; column $file
+echo "n: $n, sum: $sum, avg: "$(printf "%0.3f" $avg)", Std. Deviation: "$(printf "%0.3f" $sd)", Std. Error: "$(printf "%0.3f" $se)
+
+while [ 1 ]; do
+read -p "Expected Value (aka Null Hypothesis): " ev
+if [[ $n -lt 30 ]]; then
+	m="t"
+	ttest
+else
+	m="z"
+	ztest
+fi
+echo "$m-test: "$(printf "%0.3f" $score)" (DOF: "$(($n - 1))")"
+done
