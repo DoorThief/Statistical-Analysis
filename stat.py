@@ -3,14 +3,17 @@
 #Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
 
 from math import sqrt
-
+from sys import argv
 							#variable sanitation (if var += then previously defined/unknown value could leak into current session.)
 _n = 0							#n	(+=)
 _sum = 0						#sum	(+=)
 _test = 'z'						#currenly only z-test supported
 _temp = 0						#temporary number for arithmatic evaluation	(+=)
 
-dataset = input("File containing dataset: ")		#prompts user for dataset file
+try:
+        dataset = argv[1]                               #try to use first argument as file
+except IndexError:					#on error: IndexError - That means no arguments were proved
+        dataset = input("File containing dataset: ")    #prompts user for dataset file
 
 with open(dataset,'r') as data:				#With data (aka. the handler for open(dataset)
 	for line in data:				#For iterate each line in data (every line in dataset)
@@ -32,4 +35,4 @@ _ev = float(usrEV)					#sanitation: usr inputs strings, must convert to a float
 
 _score = (_avg - _ev) / sqrt(_n)			#z score = difference of avg and ev, divided by square root of n
 
-print('{}-test = {}'.format(_test, _score))		#prints z-test = score
+print('{}-test = {}'.format(_test, round(_score,3)))	#prints z-test = score
