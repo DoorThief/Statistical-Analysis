@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+#Author: Nicholas Martin
+#Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
 
 from math import sqrt
 
