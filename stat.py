@@ -35,4 +35,4 @@ _ev = float(usrEV)					#sanitation: usr inputs strings, must convert to a float
 
 _score = (_avg - _ev) / sqrt(_n)			#z score = difference of avg and ev, divided by square root of n
 
-print('{}-test = {}'.format(_test, round(_score,3)))	#prints z-test = score
+print('{}-test = {}'.format(_test, round(_score,3)))	#prints z-test = score (rounded to 3rd decimal)
