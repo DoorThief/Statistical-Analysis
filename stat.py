@@ -1,31 +1,37 @@
 #!/usr/bin/python3
+
 from math import sqrt
 
-ds_n = 0	#n
-ds_sum = 0	#sum
-ds_avg = 0	#avg
-ds_sd = 0	#std. deviation
-ds_se = 0	#std. error
-ds_score = 0	#score from z or t test
-ds_test	= 'z'
+_n = 0			#n
+_sum = 0	#sum
+_avg = 0	#avg
+_sd = 0		#std. deviation
+_se = 0		#std. error
+_ev = 0		#ev/H0
+_score = 0	#score from z or t test
+_test	= 'z'	#currenly only z-test supported
 temp = 0	#temporary number for arithmatic evaluation
 
 dataset = input("File containing dataset: ")	#User defined file {dataset}
-usrEV = input("Define an EV (Null hypothesis): ")
-ev = int(usrEV)
 
 with open(dataset,'r') as data:
 	for line in data:
-		ds_n = ds_n + 1
-		try:
-			ds_sum += float(line)
-			temp = temp + ((float(line) - ev)**2 / ds_n)
+		_n += 1
+		_sum += float(line)
 
-		except ValueError:
-			print('{} is not a number!'.format(line))
+	_avg = (_sum / _n)
 
-ds_avg = (ds_sum / ds_n)
-ds_sd = sqrt(temp)
-ds_se = ds_sd / sqrt(ds_n)
+	data.seek(0)
+	for line in data:
+		temp += ((float(line) - _avg)**2)
 
-print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}, {}-score: {}'.format(ds_n, ds_sum, round(ds_avg, 2), round(ds_sd,3), ds_se, ds_test, ds_score))
+_sd = sqrt(temp / _n)
+_se = _sd / sqrt(_n)
+
+print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(_n, _sum, round(_avg, 2), round(_sd,3), round(_se, 3)))
+usrEV = input("Define an EV (Null hypothesis): ")
+_ev = int(usrEV)
+
+_score = (_avg - _ev) / sqrt(_n)
+
+print('{}-test = {}'.format(_test, _score))
