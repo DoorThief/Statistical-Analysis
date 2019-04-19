@@ -10,7 +10,7 @@ elif [[ -f $file  ]]; then
 	n=0
 	sum=0
 	for line in $(cat $file); do
-		sum=$(echo "$sum + $line" | bc -l)
+		sum=$(echo "$sum + $line" | bc -l)	#for loop pipe to bc causes significant slowdown
 		n=$(($n+1))
 	done
 	avg=$(echo "$sum / $n" | bc -l)
@@ -23,7 +23,7 @@ fi
 getsd() {
 sd=0
 	for i in $(cat $file); do
-		sd=$(echo "$sd + ($i - $avg)^2" | bc -l)
+		sd=$(echo "$sd + ($i - $avg)^2" | bc -l)	#for loop pipe to bc causes significant slowdown
 	done
 	sd=$(echo "sqrt($sd / $n)" | bc -l)
 }
