@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #Author: Nicholas Martin
 #Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
+#Github repo: https://github.com/DoorThief/Statistic-Analysis
 
 from math import sqrt
 from sys import argv
