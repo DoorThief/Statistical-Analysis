@@ -1,17 +1,21 @@
 #!/usr/bin/python3
-#Author: Nicholas Martin
 #Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
 #Github repo: https://github.com/DoorThief/Statistic-Analysis
 
 from math import sqrt
-from sys import argv
+import argparse
+
+parser = argparse.ArgumentParser(description='A rudimentary statistical analysis program.')
+parser.add_argument('-f1', '--file1', type=str,
+                    help='Required: Specify file \#1.')
+args = parser.parse_args()
 							#variable sanitation (if var += then previously defined/unknown value could leak into current session.)
 _n = 0							#n	(+=)
 _sum = 0						#sum	(+=)
 _temp = 0						#temporary number for arithmatic evaluation	(+=)
 
 try:
-        dataset = argv[1]                               #try to use first argument as file
+        dataset = args.file1                               #try to use first argument as file
 except IndexError:					#on error: IndexError - That means no arguments were proved
         dataset = input("File containing dataset: ")    #prompts user for dataset file
 
