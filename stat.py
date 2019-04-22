@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#Author: Nicholas Martin
 #Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
 #Github repo: https://github.com/DoorThief/Statistic-Analysis
 
@@ -7,7 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='A rudimentary statistical analysis program.')
 parser.add_argument('-f1', '--file1', type=str,
-                    help='Required: Specify file \#1.')
+                    help='Required: Specify file #1.')
 args = parser.parse_args()
 							#variable sanitation (if var += then previously defined/unknown value could leak into current session.)
 _n = 0							#n	(+=)
@@ -19,16 +20,20 @@ try:
 except IndexError:					#on error: IndexError - That means no arguments were proved
         dataset = input("File containing dataset: ")    #prompts user for dataset file
 
-with open(dataset,'r') as data:				#With data (aka. the handler for open(dataset)
-	for line in data:				#For iterate each line in data (every line in dataset)
-		_n += 1					#Increment _n by 1
-		_sum += float(line)			#Adds line (in float form ie. 1.0000) to _sum
+try:
+	with open(dataset,'r') as data:				#With data (aka. the handler for open(dataset)
+		for line in data:				#For iterate each line in data (every line in dataset)
+			_n += 1					#Increment _n by 1
+			_sum += float(line)			#Adds line (in float form ie. 1.0000) to _sum
 
-	_avg = (_sum / _n)				#avg = sum / n
+		_avg = (_sum / _n)				#avg = sum / n
 
-	data.seek(0)					#In preperation to use another for each line, we use seek(0) to go back to top of file
-	for line in data:				#For iterate each line in data (every line in dataset)
-		_temp += ((float(line) - _avg)**2)	#subtract line by avg, then square and add result to _temp
+		data.seek(0)					#In preperation to use another for each line, we use seek(0) to go back to top of file
+		for line in data:				#For iterate each line in data (every line in dataset)
+			_temp += ((float(line) - _avg)**2)	#subtract line by avg, then square and add result to _temp
+except TypeError:
+        parser.print_help()
+        exit(1)
 
 _sd = sqrt(_temp / _n)					#sd = square root of (_temp / n)
 if _n < 30:
