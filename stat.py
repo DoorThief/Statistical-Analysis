@@ -8,7 +8,6 @@ from sys import argv
 							#variable sanitation (if var += then previously defined/unknown value could leak into current session.)
 _n = 0							#n	(+=)
 _sum = 0						#sum	(+=)
-_test = 'z'						#currenly only z-test supported
 _temp = 0						#temporary number for arithmatic evaluation	(+=)
 
 try:
@@ -28,12 +27,22 @@ with open(dataset,'r') as data:				#With data (aka. the handler for open(dataset
 		_temp += ((float(line) - _avg)**2)	#subtract line by avg, then square and add result to _temp
 
 _sd = sqrt(_temp / _n)					#sd = square root of (_temp / n)
-_se = _sd / sqrt(_n)					#se = se / square root of n
+if _n < 30:
+	_test = 't'
+	_sdp = _sd * sqrt(_n/(_n-1))
+	_sep = _sdp / sqrt(_n)
+	print('n: {},  Sum: {}, Avg: {}, Std. Deviation+: {}, Std. Error+: {}'.format(_n, _sum, round(_avg, 2), round(_sdp,3), round(_sep, 3))) #Prints results using formatter and {} as placeholders. Round is used to round... duh.
+else:
+	_test = 'z'
+	_se = _sd / sqrt(_n)				#se = se / square root of n
+	print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(_n, _sum, round(_avg, 2), round(_sd,3), round(_se, 3))) #Prints results using formatter and {} as placeholders. Round is used to round... duh.
 
-print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(_n, _sum, round(_avg, 2), round(_sd,3), round(_se, 3))) #Prints results using formatter and {} as placeholders. Round is used to round... duh.
 usrEV = input("Define an EV (Null hypothesis): ")	#prompts user to define ev
 _ev = float(usrEV)					#sanitation: usr inputs strings, must convert to a float
 
-_score = (_avg - _ev) / sqrt(_n)			#z score = difference of avg and ev, divided by square root of n
+if _test == 'z':
+	_score = (_avg - _ev) * _se			#z score = difference of avg and ev, mutiplied by se
+elif _test == 't':
+	_score = (_avg - _ev) / _sep
 
 print('{}-test = {}'.format(_test, round(_score,3)))	#prints z-test = score (rounded to 3rd decimal)
