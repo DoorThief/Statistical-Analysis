@@ -1,57 +1,85 @@
-#!/usr/bin/python3
-#Author: Nicholas Martin
-#Description: Given a dataset via file, the script with calulate n, sum, mean, standard deviation & error, and perform a z-test of user defined expected value derived from null hypothesis.
-#Github repo: https://github.com/DoorThief/Statistic-Analysis
-
 from math import sqrt
 import argparse
 
 parser = argparse.ArgumentParser(description='A rudimentary statistical analysis program.')
 parser.add_argument('-f1', '--file1', type=str,
-                    help='Required: Specify file #1.')
+	help='Required: Specify file')
+parser.add_argument('-f2', '--file2', type=str,
+	help='Optional: Specify file')
 args = parser.parse_args()
-							#variable sanitation (if var += then previously defined/unknown value could leak into current session.)
-_n = 0							#n	(+=)
-_sum = 0						#sum	(+=)
-_temp = 0						#temporary number for arithmatic evaluation	(+=)
 
-try:
-        dataset = args.file1                               #try to use first argument as file
-except IndexError:					#on error: IndexError - That means no arguments were proved
-        dataset = input("File containing dataset: ")    #prompts user for dataset file
+def get_math(dataset):
 
-try:
-	with open(dataset,'r') as data:				#With data (aka. the handler for open(dataset)
-		for line in data:				#For iterate each line in data (every line in dataset)
-			_n += 1					#Increment _n by 1
-			_sum += float(line)			#Adds line (in float form ie. 1.0000) to _sum
+	n = 0
+	sum = 0
+	temp = 0
+	try:
+		with open(dataset,'r') as data:
+			for line in data:
+				n += 1
+				sum += float(line)
 
-		_avg = (_sum / _n)				#avg = sum / n
+			avg = (sum / n)
+			get_math.avg = avg
 
-		data.seek(0)					#In preperation to use another for each line, we use seek(0) to go back to top of file
-		for line in data:				#For iterate each line in data (every line in dataset)
-			_temp += ((float(line) - _avg)**2)	#subtract line by avg, then square and add result to _temp
-except TypeError:
-        parser.print_help()
-        exit(1)
+			data.seek(0)
+			for line in data:
+				temp += ((float(line) - avg)**2)
+	except:
+		parser.print_help()
+		exit(1)
 
-_sd = sqrt(_temp / _n)					#sd = square root of (_temp / n)
-if _n < 30:
-	_test = 't'
-	_sdp = _sd * sqrt(_n/(_n-1))
-	_sep = _sdp / sqrt(_n)
-	print('n: {},  Sum: {}, Avg: {}, Std. Deviation+: {}, Std. Error+: {}'.format(_n, _sum, round(_avg, 2), round(_sdp,3), round(_sep, 3))) #Prints results using formatter and {} as placeholders. Round is used to round... duh.
+	sd = sqrt(temp / n)
+	if n < 30:
+		test = 't'
+		get_math.test = test
+		sdp = sd * sqrt(n/(n-1))
+		sep = sdp / sqrt(n)
+		get_math.sep = sep
+		print('n: {},  Sum: {}, Avg: {}, Std. Deviation+: {}, Std. Error+: {}'.format(n, sum, round(avg, 2), round(sdp,3), round(sep, 3)))
+	else:
+		test = 'z'
+		get_math.test = test
+		se = sd / sqrt(n)
+		get_math.se = se
+		print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(n, sum, round(avg, 2), round(sd,3), round(se, 3)))
+
+if args.file1 and args.file2:
+	try:
+		get_math(args.file1)
+		if get_math.test == 'z':
+			f1_avg =  get_math.avg
+			f1_se = get_math.se
+		else:
+			print('Error: Sample size too small.')
+			exit(0)
+		get_math(args.file2)
+		if get_math.test == 'z':
+			f2_avg =  get_math.avg
+			f2_se = get_math.se
+		else:
+			print('Error: Sample size too small.')
+			exit(0)
+		z_avgdif = f1_avg - f2_avg
+		z_sedif = sqrt(f1_se**2 + f2_se**2)
+		print('Null hypothesis for 2 Sample Z-Test is usually: "There is no difference ie. EV = 0"')
+		ev = input("Define an EV: ")
+		z = (z_avgdif - float(ev)) / z_sedif
+		print('2 Sample Z-Test score: {}'.format(round(z, 3)))
+	except:
+		print('Error: Cannot use 2 Sample Z-Test.')
+		exit(1)
 else:
-	_test = 'z'
-	_se = _sd / sqrt(_n)				#se = se / square root of n
-	print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(_n, _sum, round(_avg, 2), round(_sd,3), round(_se, 3))) #Prints results using formatter and {} as placeholders. Round is used to round... duh.
+	get_math(args.file1)
+	usrEV = input("Define an EV (Null hypothesis): ")
+	ev = float(usrEV)
+	test = get_math.test
+	avg = get_math.avg
+	if test == 'z':
+		se = get_math.se
+		score = (avg - ev) * se
+	elif test == 't':
+		sep = get_math.sep
+		score = (avg - ev) / sep
 
-usrEV = input("Define an EV (Null hypothesis): ")	#prompts user to define ev
-_ev = float(usrEV)					#sanitation: usr inputs strings, must convert to a float
-
-if _test == 'z':
-	_score = (_avg - _ev) * _se			#z score = difference of avg and ev, mutiplied by se
-elif _test == 't':
-	_score = (_avg - _ev) / _sep
-
-print('{}-test = {}'.format(_test, round(_score,3)))	#prints z-test = score (rounded to 3rd decimal)
+	print('{}-test = {}'.format(test, round(score,3)))
