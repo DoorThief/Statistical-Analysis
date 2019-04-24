@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+#description: A rudimentary statistical analysis program. Capable of calculating the: count of lines, sum, mean, std. deviation, std. error, and perform tests of significance (Z-test, T-Test, 2 sample Z-Test)
+#github repository: https://github.com/DoorThief/Statistical-Analysis
+
 from math import sqrt
 import argparse
 
@@ -9,7 +13,7 @@ parser.add_argument('-f2', '--file2', type=str,
 args = parser.parse_args()
 
 def get_math(dataset):
-
+	#Start of get_math()
 	n = 0
 	sum = 0
 	temp = 0
@@ -43,6 +47,7 @@ def get_math(dataset):
 		se = sd / sqrt(n)
 		get_math.se = se
 		print('n: {},  Sum: {}, Avg: {}, Std. Deviation: {}, Std. Error: {}'.format(n, sum, round(avg, 2), round(sd,3), round(se, 3)))
+#End of get_math()
 
 if args.file1 and args.file2:
 	try:
@@ -81,5 +86,4 @@ else:
 	elif test == 't':
 		sep = get_math.sep
 		score = (avg - ev) / sep
-
 	print('{}-test = {}'.format(test, round(score,3)))
